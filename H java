@@ -1,0 +1,115 @@
+import java.util.*;
+
+class StableMarriage {
+    static int N;
+    static Map<String, Integer> maleIndex = new HashMap<>();
+    static Map<String, Integer> femaleIndex = new HashMap<>();
+    static String[] males, females;
+    
+    static boolean prefers(int[][] prefer, int w, int m1, int m) {
+        for (int i = 0; i < N; i++) {
+            if (prefer[w][i] == m1) return true;
+            if (prefer[w][i] == m) return false;
+        }
+        return false;
+    }
+
+    static void stableMarriage(int[][] menPref, int[][] womenPref) {
+        int[] womenPartner = new int[N];
+        boolean[] menFree = new boolean[N];
+        Arrays.fill(womenPartner, -1);
+
+        int freeCount = N;
+        int operations = 0;
+
+        long startTime = System.nanoTime();
+
+        while (freeCount > 0) {
+            int m;
+            for (m = 0; m < N; m++) {
+                if (!menFree[m]) break;
+            }
+
+            for (int i = 0; i < N && !menFree[m]; i++) {
+                int w = menPref[m][i];
+                operations++;
+
+                if (womenPartner[w] == -1) {
+                    womenPartner[w] = m;
+                    menFree[m] = true;
+                    freeCount--;
+                } else {
+                    int m1 = womenPartner[w];
+                    operations++;
+
+                    if (prefers(womenPref, w, m, m1)) {
+                        womenPartner[w] = m;
+                        menFree[m] = true;
+                        menFree[m1] = false;
+                    }
+                }
+            }
+        }
+
+        long endTime = System.nanoTime();
+        long executionTime = endTime - startTime;
+
+        System.out.println("\n💍 Stable Marriages:");
+        for (int i = 0; i < N; i++) {
+            System.out.println("👩 " + females[i] + " is engaged to 👨 " + males[womenPartner[i]]);
+        }
+
+        System.out.println("\n📊 Time Complexity Analysis:");
+        System.out.println("Total Operations: " + operations);
+        System.out.println("Execution Time: " + executionTime / 1_000_000.0 + " ms");
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        
+        System.out.print("Enter number of males/females: ");
+        N = sc.nextInt();
+        sc.nextLine();
+        
+        males = new String[N];
+        females = new String[N];
+
+        System.out.println("Enter male names (space-separated):");
+        String[] maleNames = sc.nextLine().split(" ");
+        for (int i = 0; i < N; i++) {
+            males[i] = maleNames[i];
+            maleIndex.put(maleNames[i], i);
+        }
+
+        System.out.println("Enter female names (space-separated):");
+        String[] femaleNames = sc.nextLine().split(" ");
+        for (int i = 0; i < N; i++) {
+            females[i] = femaleNames[i];
+            femaleIndex.put(femaleNames[i], i);
+        }
+
+        int[][] menPref = new int[N][N];
+        int[][] womenPref = new int[N][N];
+
+        System.out.println("\nEnter men's preferences (most preferred to least preferred):");
+        for (int i = 0; i < N; i++) {
+            System.out.print(males[i] + "'s preferences: ");
+            String[] prefs = sc.nextLine().split(" ");
+            for (int j = 0; j < N; j++) {
+                menPref[i][j] = femaleIndex.get(prefs[j]);
+            }
+        }
+
+        System.out.println("\nEnter women's preferences (most preferred to least preferred):");
+        for (int i = 0; i < N; i++) {
+            System.out.print(females[i] + "'s preferences: ");
+            String[] prefs = sc.nextLine().split(" ");
+            for (int j = 0; j < N; j++) {
+                womenPref[i][j] = maleIndex.get(prefs[j]);
+            }
+        }
+
+        stableMarriage(menPref, womenPref);
+        sc.close();
+    }
+}
