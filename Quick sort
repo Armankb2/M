@@ -1,0 +1,92 @@
+import java.util.Scanner;
+
+class QuickSort {
+    // Partition function (first element as pivot)
+    int partition(int arr[], int low, int high) {
+        int pivot = arr[low]; // Taking the first element as the pivot
+        int i = low + 1;  // Pointer for greater elements
+        int j = high; // Pointer for smaller elements
+
+        while (i <= j) {
+            // Find an element greater than the pivot
+            while (i <= high && arr[i] <= pivot) {
+                i++;
+            }
+            // Find an element smaller than the pivot
+            while (j >= low && arr[j] > pivot) {
+                j--;
+            }
+            // Swap elements if i < j
+            if (i < j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+
+        // Swap pivot with the correct position
+        int temp = arr[low];
+        arr[low] = arr[j];
+        arr[j] = temp;
+
+        return j; // Return pivot index
+    }
+
+    // QuickSort function
+    void quickSort(int arr[], int low, int high) {
+        if (low < high) {
+            int pi = partition(arr, low, high); // Partitioning index
+
+            // Recursively sort elements before and after partition
+            quickSort(arr, low, pi - 1);
+            quickSort(arr, pi + 1, high);
+        }
+    }
+
+    // Function to print the array
+    void printArray(int arr[]) {
+        for (int num : arr) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String args[]) {
+        Scanner scanner = new Scanner(System.in);
+
+        // User input for array size
+        System.out.print("Enter the number of elements: ");
+        int n = scanner.nextInt();
+
+        int arr[] = new int[n];
+
+        // User input for array elements
+        System.out.println("Enter " + n + " elements:");
+        for (int i = 0; i < n; i++) {
+            arr[i] = scanner.nextInt();
+        }
+
+        QuickSort qs = new QuickSort();
+        System.out.println("\nOriginal array:");
+        qs.printArray(arr);
+
+        // Measure execution time
+        long startTime = System.nanoTime();
+        qs.quickSort(arr, 0, n - 1);
+        long endTime = System.nanoTime();
+
+        System.out.println("\nSorted array:");
+        qs.printArray(arr);
+
+        // Calculate execution time in milliseconds
+        double executionTime = (endTime - startTime) / 1e6;
+        System.out.println("\nExecution Time: " + executionTime + " ms");
+
+        // Display theoretical time complexity
+        System.out.println("\nTime Complexity Analysis:");
+        System.out.println("Best & Average Case: O(n log n)");
+        System.out.println("Worst Case: O(n²) (when the pivot is always smallest/largest)");
+
+        scanner.close(); // Close scanner
+    }
+}
